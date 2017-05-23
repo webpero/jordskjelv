@@ -1,0 +1,52 @@
+/* CSS for øving 9 */
+body, table {
+	font-family: "Open Sans", "Arial", "sans-serif";
+	font-size: 0.9em;
+}
+header {
+	position: fixed;
+    top: 20px;
+    left: 150px;
+    width: 300px;
+    background: linear-gradient(#fcfcfc,#d9d9d9);
+	border: 1px solid #999;
+	border-radius: 5px;
+    margin: auto;
+	padding: 0.5em;
+    z-index: 10;
+}
+input {
+	margin-bottom: 1em;
+}
+#loading {
+	float: right;
+	height: 30px;
+	margin-top: -5px;
+	margin-right: 10px;
+	display: none;
+}
+#numQuakes {
+	padding: 5px;
+	font-weight: bold;
+}
+.small {
+	font-size: 60%;
+	color: gray;
+}
+h1 {
+	margin-top: 0;
+	margin-bottom: 0.5em;
+}
+#map {
+	height: 98%;
+	width: 100%;
+}
+footer {
+	margin-top: 0.5em;
+	font-size: 80%;
+}
+footer a {
+	color: gray;
+	text-decoration: none;
+	margin-right: 5em;
+}

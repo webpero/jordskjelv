@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>Jordskjelv!</title>
+	<link rel="stylesheet"  href="jordskjelv.css" />
+ </head>
+
+<body>
+
+	<header>
+		<h1>Registrerte jordskjelv</h1>
+			<select id="dataselection" name="dataselection">
+				<option value="significant_hour">Siste time: Store!</option>
+				<option value="4.5_hour">Siste time: >4.5</option>
+				<option value="2.5_hour">Siste time: >2.5</option>
+				<option value="1.0_hour">Siste time: >1.0</option>
+				<option value="all_hour">Siste time: Alle</option>
+				<option value="significant_day">Siste dag: Store!</option>
+				<option value="4.5_day">Siste dag: >4.5</option>
+				<option value="2.5_day">Siste dag: >2.5</option>
+				<option value="1.0_day">Siste dag: >1.0</option>
+				<option value="all_day">Siste dag: Alle</option>
+				<option value="significant_week">Siste uke: Store!</option>
+				<option value="4.5_week">Siste uke: >4.5</option>
+				<option value="2.5_week" selected>Siste uke: >2.5</option>
+				<option value="1.0_week">Siste uke: >1.0</option>
+				<option value="all_week">Siste uke: Alle</option>
+				<option value="significant_month">Siste 30 dager: Store!</option>
+				<option value="4.5_month">Siste 30 dager: >4.5</option>
+				<option value="2.5_month">Siste 30 dager: >2.5</option>
+				<option value="1.0_month">Siste 30 dager: >1.0</option>
+				<option value="all_month">Siste 30 dager: Alle</option>
+			</select>
+			<img id="loading" src="ajax_loader.gif" />
+			<span id="numQuakes"></span>
+		<p class="small">Data er oppdatert hvert 5. minutt</p>
+	</header>
+	<section id="container">
+		<div id="map">
+		</div>
+	</section>
+	<footer>Data fra <a href="https://earthquake.usgs.gov/earthquakes/feed/">USGS</a><a href="https://webpero.github.io/">&copy; 2017 webpero</a></footer>
+	
+	<!-- JavaScript -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">	</script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+	<script src="https://maps.google.com/maps/api/js?key=AIzaSyAL58Of35Vjc2CeUAbSPXc1zd1ugUmYL4Q">
+		// Google Maps JavaScript API - API-key er generert fra kraftwerk68@gmail.com
+	</script>
+	<script>
+	var map;
+	var markers = [];
+
+    $(function() {
+		// Opprett kart og sentrer kartet i Oslo
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 3,
+          center: new google.maps.LatLng(59.91386880,10.75224540),
+          mapTypeId: 'satellite'
+        });
+		// Hent data på nytt hver gang bruker velger ny periode
+		$("#dataselection").change( function() {
+			clearMarkers();	// Ta vekk alle markører
+			$("header").effect( "bounce", 500 );
+			initMap();		// Hent data på nytt
+		});
+		// Vis kart med default periode
+		initMap();
+	});
+	function initMap()  
+	{
+		showMap($("#dataselection").val());
+	}
+	function showMap(selection)
+	{
+		// Sett status "loading"
+		$("#loading").toggle();
+        // Opprett script-tag med riktig USGS URL som kilde for jordskjelvdata
+		var scriptUSGS = document.createElement('script');		
+		scriptUSGS.src = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/" + selection + ".geojsonp";
+        document.getElementsByTagName('head')[0].appendChild(scriptUSGS);
+    }
+	function clearMarkers()
+	{
+		//Fjern alle markører
+		for (var i = 0; i < markers.length; i++) {
+			markers[i].setMap(null);
+        }
+		markers.lenght = 0;
+	}
+	
+    // Hent ut data for jordskjelv når disse blir returnert fra USGS
+    window.eqfeed_callback = function(results) {
+		console.log("callback start");
+		for (var i = 0; i < results.features.length; i++) {
+			var coords = results.features[i].geometry.coordinates;
+			var latLng = new google.maps.LatLng(coords[1],coords[0]);
+			// Opprett markør med ønskede data
+			var marker = new google.maps.Marker({
+				position: latLng,
+				map: map,
+				title: results.features[i].properties.title,
+				url: results.features[i].properties.url
+			});
+			// Legg til klikk på markør: gå til infoside for skjelvet
+			marker.addListener('click', function() {
+				window.open(this.url, '_new');
+			});
+			markers.push(marker);
+        }
+		// Vis santall skjelv
+		$("#numQuakes").text( i + " skjelv" );
+		console.log("callback stop [" + i + "]");
+
+		// Fjern status "loading"
+		$("#loading").toggle();
+    }
+	</script>
+
+</body>
+</html>
